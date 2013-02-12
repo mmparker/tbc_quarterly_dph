@@ -4,7 +4,7 @@
 # Strings ain't factors
 options(stringsAsFactors = FALSE)
 
-
+library(plyr)
 library(RODBC)
 
 
@@ -25,6 +25,8 @@ actives <- sqlQuery(plus, "
     ORDER BY date_counted
 ")
 
+
+odbcClose(plus)
 
 
 # Load the county codes
