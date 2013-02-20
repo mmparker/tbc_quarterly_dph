@@ -12,9 +12,9 @@ options(stringsAsFactors = FALSE)
 
 
 
-query_visits <- function(start_date,
-                         stop_date = Sys.Date(),
-                         odbc = "tbdbplus64") {
+query_tests <- function(start_date,
+                        stop_date = Sys.Date(),
+                        odbc = "tbdbplus64") {
 
     # TODO: argument validation
 
