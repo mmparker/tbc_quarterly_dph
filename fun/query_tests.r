@@ -31,9 +31,9 @@ query_visits <- function(start_date,
                 pt_agency
          FROM TST_View
          WHERE external_clinic = ''
-            AND reader_affiliation = 'Denver Metro TB Clinic'
+            AND (reader_affiliation = 'Denver Metro TB Clinic'
                 OR (pt_agency = 'Denver Public Health - Metro TB Clinic'
-                    AND tst_read_by IS NULL)
+                    AND tst_read_by IS NULL))
              AND date_given BETWEEN #",
              start_date, 
              "# AND #",
@@ -41,6 +41,7 @@ query_visits <- function(start_date,
              "#",
         sep = "")
     )
+
 
 
 
