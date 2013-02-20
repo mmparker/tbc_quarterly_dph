@@ -10,6 +10,8 @@ query_actives <- function(start_date,
                           stop_date = Sys.Date(),
                           odbc = "tbdbplus64") {
 
+    # TODO: argument validation
+
     require(RODBC)
 
     dbconnect <- odbcConnect(odbc)
@@ -30,6 +32,13 @@ query_actives <- function(start_date,
     ")
 
     odbcClose(dbconnect)
+
+
+    # Convert the dates to Dates - POSIXct is overly complicated here
+    actives$date_of_birth <- as.Date(actives$date_of_birth)
+    actives$date_counted <- as.Date(actives$date_counted)
+    actives$tx_start_date <- as.Date(actives$tx_start_date)
+
 
     # The minimum of date_counted and tx_start_date is generally a good
     # guess at when we identified a case. Count dates can be months after
@@ -52,7 +61,13 @@ query_actives <- function(start_date,
     actives$qtr_id <- (as.numeric(actives$mon_id) + 2) %/% 3
 
 
-    actives
+
+    # Subset to active cases in the requested date range
+    queried_actives <- subset(actives, 
+                              date_id >= start_date &
+                              date_id <= stop_date)
+
+    queried_actives
 
 }
 
