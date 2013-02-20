@@ -77,9 +77,15 @@ query_visits <- function(start_date,
     qfts$test_date <- as.Date(qfts$collection_date, format = "%m/%d/%Y")
 
 
+    # Subset QFTs by date
+    qfts_datelim <- subset(qfts, 
+                           test_date >= start_date &
+                           test_date <= stop_date)
+
+
     # Melt it into a single dataset
     tsts$test <- "TST"
-    qfts$test <- "QFT"
+    qfts_datelim$test <- "QFT"
     cxrs$test <- "CXR"
 
 
@@ -89,7 +95,7 @@ query_visits <- function(start_date,
     # This will result in some false counts, but few relative to the total
     # number of TSTs.
     tsts$seq_id <- seq_along(tsts$person_id)
-    qfts$seq_id <- seq_along(qfts$person_id)
+    qfts_datelim$seq_id <- seq_along(qfts_datelim$person_id)
     cxrs$seq_id <- seq_along(cxrs$person_id)
 
     # Combine into a single data.frame for ease of plotting
@@ -98,7 +104,7 @@ query_visits <- function(start_date,
                               measure.vars = c("test", "result")),
                          person_id + test_date + seq_id ~ variable),
 
-                   dcast(melt(qfts, 
+                   dcast(melt(qfts_datelim, 
                               id.vars = c("person_id", "test_date", "seq_id"),
                               measure.vars = c("test", "result")),
                          person_id + test_date + seq_id ~ variable),
