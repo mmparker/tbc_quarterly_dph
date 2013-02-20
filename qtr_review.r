@@ -7,14 +7,16 @@ options(stringsAsFactors = FALSE)
 require(ggplot2)
 require(plyr)
 
+start_date <- as.Date("2011-01-01")
+stop_date <- as.Date("2012-12-31")
 
 
 ## Clinic and Outreach Visits
 
 source("fun/query_visits.r")
 
-visits <- query_visits(start_date = as.Date("2009-01-01"),
-                       stop_date = as.Date("2012-12-31"))
+visits <- query_visits(start_date = start_date,
+                       stop_date = stop_date)
 
 visits$plot_qtr <- with(visits, paste(visit_yr, " Q", visit_qtr, sep = ""))
 
@@ -43,11 +45,28 @@ ggplot(visitagg, aes(x = plot_qtr, y = freq,
 
 
 
-## Screening for Latent TB Infection
+## Screenings for Active and Latent Tuberculosis
 
 
+source("fun/query_tests.r")
 
+tests <- query_tests(start_date = start_date,
+                     stop_date = stop_date)
 
+tests$plot_qtr <- with(tests, paste(test_yr, " Q", test_qtr, sep = ""))
+
+testagg <- count(tests, vars = c("test", "plot_qtr"))
+
+ggplot(testagg, aes(x = plot_qtr, y = freq, 
+                    group = test, color = test)) +
+    geom_point(size = 3) +
+    geom_line(size = 1.3) +
+    expand_limits(y = 0) +
+    scale_color_discrete("Diagnostic") +
+    labs(x = "Diagnostic Date", 
+         y = "Number of Diagnostics",
+         title = "Screenings for Active and Latent Tuberculosis") +
+    theme_bw()
 
 
 ## Reported TB Cases by Quarter and County of Residence
@@ -55,8 +74,8 @@ ggplot(visitagg, aes(x = plot_qtr, y = freq,
 source("fun/query_actives.r")
 
 
-actives <- query_actives(start_date = as.Date("2011-01-01"),
-                         stop_date = as.Date("2012-12-31"))
+actives <- query_actives(start_date = start_date,
+                         stop_date = stop_date)
 
 
 actives$plot_qtr <- with(actives, paste(yr_id, " Q", qtr_id, sep = ""))
