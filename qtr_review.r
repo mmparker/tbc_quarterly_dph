@@ -11,7 +11,7 @@ start_date <- as.Date("2011-01-01")
 stop_date <- as.Date("2012-12-31")
 
 
-## Clinic and Outreach Visits
+## Visits - Clinic vs. Outreach
 
 source("fun/query_visits.r")
 
@@ -45,6 +45,40 @@ ggplot(visitagg, aes(x = plot_qtr, y = freq,
 
 
 
+
+
+## Visits - Encounters vs. DOT 
+# (maybe this should be treatment vs non-tx, but I'd need to add LTBI pickups)
+visits$dot <- NA
+
+visits$reason[visits$dispense_type %in% c("DOT", "DOPT")] <- "DOT"
+
+visits$reason[is.na(visits$dispense_type)] <- "Medical Evaluation, Etc."
+
+reason_agg <- count(visits, vars = c("plot_qtr", "reason"))
+
+allreasons <- count(visits, vars = "plot_qtr")
+allreasons$reason <- "All Visits"
+
+visit_reasons <- rbind(reason_agg, allreasons)
+
+ggplot(visit_reasons, aes(x = plot_qtr, y = freq, 
+                          group = reason, color = reason)) +
+    geom_point(size = 3) +
+    geom_line(size = 1.3) +
+    expand_limits(y = 0) +
+    scale_color_discrete("Visit Reason") +
+    labs(x = "Visit Date", 
+         y = "Number of Visits",
+         title = "Patient Visits by Location") +
+    theme_bw()
+
+
+
+
+
+
+
 ## Screenings for Active and Latent Tuberculosis
 
 
@@ -69,6 +103,11 @@ ggplot(testagg, aes(x = plot_qtr, y = freq,
     theme_bw()
 
 
+
+
+
+
+
 ## Reported TB Cases by Quarter and County of Residence
 
 source("fun/query_actives.r")
@@ -88,11 +127,13 @@ actives$plot_group[actives$metro_case %in% "True" &
 ggplot(subset(actives, !is.na(plot_group)),
        aes(x = plot_qtr, fill = plot_group)) +
     geom_bar(color = "black") +
+    stat_bin(geom="text", aes(label=..count.., vjust = 1.25)) +
     scale_fill_manual("Patient's Residence", values = c("#ADDD8E", "#31A354")) +
     labs(x = "Quarter Identified (earliest of date treatment started or date case reported)", 
          y = "Number of cases",
          title = "Metro TB Cases by Residence") +
     theme_bw()
+
 
 
 
