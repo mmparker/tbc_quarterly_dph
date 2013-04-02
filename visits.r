@@ -10,7 +10,7 @@ library(plyr)
 
 
 # Connect to TBdbPlus
-plus <- odbcConnect("tbdbplus")
+plus <- odbcConnect("tbdbplus64")
 
 
 # Load the encounters
@@ -18,6 +18,7 @@ enc <- sqlQuery(plus, "
 
 	SELECT DISTINCT m.person_id, 
                     m.eval_date AS visit_date, 
+                    m.visit_location,
                     m.eval_type,
                     m.staff_responsible, 
                     d.affiliation AS eval_affiliation, 
@@ -70,6 +71,9 @@ visits <- merge(x = enc,
                 by = c("person_id", "visit_date"),
                 all = TRUE)
 
+
+
+# Add month/qtr/year variables for aggregation
 visits$visit_mon <- as.character(format(as.Date(visits$visit_date), "%m"))
 
 visits$visit_qtr <- NA
@@ -105,7 +109,7 @@ table(twelve$staffguess, exclude = NULL)
 
 
 # Pull in the LifeLink visits for comparison
-dhdw <- odbcConnect("dhdw")
+dhdw <- odbcConnect("dhdw64")
 
 ll_visits <- sqlQuery(dhdw, "
 
