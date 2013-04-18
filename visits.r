@@ -104,7 +104,11 @@ table(twelve$staffguess, exclude = NULL)
 
 
 
+x <- subset(visits, 
+            visit_date >= as.POSIXct("2013-01-01") &
+            visit_date <= as.POSIXct("2013-03-31"))
 
+count(x, c("visit_location", "dispense_type"))
 
 
 
@@ -152,8 +156,8 @@ LEFT JOIN dhdcdtw.smsdss.S2_PtIdV pid with (nolock)
     ON a.ptobjid = pid.ptobjid 
     AND pid.IDTypeMNE = 'MRN'
 
-WHERE  a.StrDtime >= '2012-01-01'
-    AND a.StrDtime < '2013-01-01'
+WHERE  a.StrDtime >= '2013-01-01'
+    AND a.StrDtime < '2013-04-01'
     AND LocMne = 'PAV H TBC'
 	AND a.CmpltInd = '1'
 ORDER BY pid.IDVal, a.StrDtime

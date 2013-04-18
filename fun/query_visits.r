@@ -104,6 +104,10 @@ query_visits <- function(start_date,
 
     # Recode the visit locations
     visits$location <- NA 
+
+    # For my purposes, visit_location = 0 is the same as visit_location = NA
+    visits$visit_location[visits$visit_location %in% 0] <- NA
+
     visits$location[visits$visit_location %in% 1] <- "Clinic"
     visits$location[visits$visit_location %in% 2] <- "Outreach"
     visits$location[visits$visit_location %in% 3] <- "Outreach"
