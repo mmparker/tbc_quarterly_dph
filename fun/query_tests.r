@@ -19,6 +19,7 @@ query_tests <- function(start_date,
     # TODO: argument validation
 
     require(RODBC)
+    require(reshape2)
 
     dbconnect <- odbcConnect(odbc)
 

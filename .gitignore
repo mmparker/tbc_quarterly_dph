@@ -1,2 +1,7 @@
 *.csv
 *.xls
+cache/*
+figure/
+functionalize/
+*.html
+*.md
