@@ -119,6 +119,9 @@ query_tests <- function(start_date,
     )
 
 
+    # Convert test_date to Date
+    tests$test_date <- as.Date(tests$test_date)
+
 
     # Add month-, quarter-, and year-of-visit variables for ease of aggregation
     tests$test_mon <- as.character(
