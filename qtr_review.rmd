@@ -1,6 +1,61 @@
+
+
+<style type="text/css">
+
+body {
+  padding-bottom: 20%;
+}
+
+table {
+  border: 1px solid #808080;
+  border-collapse: collapse;
+}
+
+th {
+  background-color: #31A354;
+  color: #FFFFFF;
+  border: 1px solid #808080;
+  padding-right: 20px;
+  padding-left: 20px;
+}
+
+td {
+  border: 1px solid #808080;
+  padding-right: 20px;
+  padding-left: 20px;
+}
+
+.maintitle {
+  text-align: left;
+  padding-top: 0px;
+}
+
+h2 {
+  text-align: left;
+  padding-top: 80px;
+}
+
+h3, h4 {
+  padding-top: 30px;
+}
+
+hr {
+  border: 0;
+  height: 1px;
+  background: #333;
+  background-image: -webkit-linear-gradient(left, #ccc, #333, #ccc); 
+  background-image:    -moz-linear-gradient(left, #ccc, #333, #ccc); 
+  background-image:     -ms-linear-gradient(left, #ccc, #333, #ccc); 
+  background-image:      -o-linear-gradient(left, #ccc, #333, #ccc); 
+}
+
+</style>
+
+
+
 # Denver Metro TB Control Program
 # Quarterly Strategic Area Review
-### Fourth Quarter 2012
+### First Quarter, 2013
 
 ```{r setup, echo=FALSE,results='hide'}
 options(stringsAsFactors = FALSE)
@@ -9,6 +64,7 @@ library(knitr)
 library(ggplot2)
 library(plyr)
 library(reshape2)
+library(xtable)
 
 # Set default chunk options
 opts_chunk$set(echo = FALSE,
@@ -16,27 +72,181 @@ opts_chunk$set(echo = FALSE,
                message = FALSE,
                warning = TRUE,
                error = TRUE,
-               fig.width = 12,
+               fig.width = 10,
+               dev="svg",
                cache = TRUE)
 
 
-start_date <- as.Date("2011-01-01")
-stop_date <- as.Date("2012-12-31")
+start_date <- as.Date("2011-04-01")
+stop_date <- as.Date("2013-03-31")
+
+
+# A function for pretty-printing data.frames
+dfprint <- function(df, printdigits = 2) {
+    print(
+        xtable(format(df, 
+                      na.encode = FALSE, 
+                      digits = printdigits, 
+                      nsmall = printdigits), 
+               align = c("l", "l", rep("c", ncol(df) - 1))
+        ),
+        type = "html",
+        include.rownames = FALSE,
+        NA.string = "-")
+}
+
+
+
 ```
 
 
 
 ## TB Cases in the Denver Metropolitan Area
+-------------------------------------------
 
-### Total Cases
+```{r cases}
+source("fun/query_actives.r")
+
+
+actives <- query_actives(start_date = start_date,
+                         stop_date = stop_date)
+
+metroactives <- subset(actives, metro_case %in% 'True')
+
+
+# Temporary adjustment
+blank <- rep(NA, 6)
+actives_adj <- data.frame(mrn = blank,
+                          person_id = blank,
+                          last_name = c("IBOBO", "THEN", "KINGMAN", "HASSAN", "KAME", "ZENG"),
+                          first_name = blank,
+                          date_of_birth = blank,
+                          date_counted = blank,
+                          tx_start_date = blank,
+                          report_county = c("Arapahoe", "Denver", "Denver", "Arapahoe", "Adams",
+                                            "Boulder"),
+                          metro_case = "True",
+                          date_id = blank,
+                          mon_id = blank,
+                          yr_id = 2013,
+                          qtr_id = 1
+)
+
+metroactives <- rbind(metroactives, actives_adj)
+
+# Create a quarter label
+metroactives$plot_qtr <- with(metroactives, paste(yr_id, " Q", qtr_id, sep = ""))
+
+# Create plot labels for county
+metroactives$plot_group <- NA
+metroactives$plot_group[metroactives$report_county %in% "Denver"] <- "Denver"
+metroactives$plot_group[!metroactives$report_county %in% "Denver"] <- "Other Metro Counties"
+
+
+# Aggregate
+actives_count <- count(metroactives, "plot_qtr")
 
 
 
-### Case Rates
+```
+
+
+```{r total_cases}
+
+ggplot(actives_count, aes(x = plot_qtr, y = freq, group = 1)) +
+    geom_point(size = 3, color = "#31A354") +
+    geom_line(size = 1.3, color = "#31A354") +
+    expand_limits(y = 0) +
+    labs(x = "Quarter Identified (earliest of date treatment started or date case reported)", 
+         y = "Number of cases",
+         title = "Active TB in Metropolitan Denver") +
+    theme_bw()
+
+
+```
+
+
+
+```{r case_rates}
+
+# Read in the population estimates
+pop <- read.csv("data/metro_pop_estimates.csv")
+
+# Aggregate
+metro_pop <- ddply(pop, .var = "year", .fun = summarise, metro_pop = sum(population))
+
+
+# Merge and calculate the case rates
+actives_count$year <- substr(actives_count$plot_qtr, 1, 4)
+
+actives_rate <- merge(x = actives_count,
+                      y = metro_pop,
+                      by = "year",
+                      all.x = TRUE)
+
+# Fill in any years with missing population estimates using the previous years
+actives_rate$metro_pop[is.na(actives_rate$metro_pop)] <-
+  actives_rate$metro_pop[!is.na(actives_rate$metro_pop)][sum(!is.na(actives_rate$metro_pop))]
+
+
+# Calculate rates
+actives_rate$rate_pht <- with(actives_rate, freq / metro_pop * 1e5)
+actives_rate$rate_pht_annualized <- with(actives_rate, freq / metro_pop * 4e5)
+
+
+# Plot it
+# ggplot(actives_rate, aes(x = plot_qtr, y = rate_pht_annualized, group = 1)) +
+#   geom_point(size = 3, color = "#31A354") +
+#   geom_line(size = 1.3, color = "#31A354") +
+#   expand_limits(y = 0) +
+#   labs(x = "Quarter Identified (earliest of date treatment started or date case reported)", 
+#        y = "Annualized Rate per 100,000 Residents",
+#        title = "Rates of Active TB in Metropolitan Denver") +
+#   theme_bw()
+```
+
+
+
+```{r cases_by_county}
+ggplot(metroactives, aes(x = plot_qtr, fill = plot_group)) +
+    geom_bar(color = "black") +
+    stat_bin(geom="text", aes(label=..count.., vjust = 1.25)) +
+    scale_fill_manual("Patient's Residence", values = c("#ADDD8E", "#31A354")) +
+    labs(x = "Quarter Identified (earliest of date treatment started or date case reported)", 
+         y = "Number of cases",
+         title = "Reported TB Cases by County of Residence") +
+    theme_bw()
+```
+
+
+
+```{r,results='asis'}
+
+
+actives_print <- ddply(metroactives, .var = "plot_qtr", .fun = summarise,
+                       total = length(report_county),
+                       denver = sum(report_county %in% 'Denver'),
+                       metro = total - denver)
+
+actives_print <- merge(x = actives_print,
+                       y = actives_rate[ , c("plot_qtr", "rate_pht_annualized")],
+                       by = "plot_qtr",
+                       all.x = TRUE)
+                       
+
+# Print it with nice names
+names(actives_print) <- c("Quarter", "Total Cases", "Denver", "Other Metro Counties",
+                          "Annualized Rate per 100k")
+
+dfprint(xtable(actives_print))
+
+
+```
 
 
 
 ## Visits - Clinic vs. Outreach
+-------------------------------------------
 
 ```{r visits_inout}
 
@@ -71,12 +281,21 @@ ggplot(visitagg, aes(x = plot_qtr, y = freq,
 ```
 
 
+```{r, results='asis'}
 
+# Cast visits wide
+visits_wide <- dcast(visitagg, plot_qtr ~ location, value.var = "freq")
 
+# Pretty-print
+names(visits_wide) <- c("Quarter", "Total Visits", "Clinic Visits", "Outreach Visits")
+
+dfprint(visits_wide)
+
+```
 
 
 ## Screenings for Active and Latent Tuberculosis
-
+-------------------------------------------
 ```{r screens}
 
 # Load the function
@@ -107,67 +326,50 @@ ggplot(testagg, aes(x = plot_qtr, y = freq,
 ```
 
 
+```{r, results='asis'}
 
+# Cast tests wide
+tests_wide <- dcast(testagg, plot_qtr ~ test, value.var = "freq")
 
+# Pretty-print
+names(tests_wide) <- c("Quarter", "CXRs", "QFTs", "TSTs")
 
+dfprint(tests_wide)
 
-## Reported TB Cases by Quarter and County of Residence
-
-```{r cases}
-source("fun/query_actives.r")
-
-
-actives <- query_actives(start_date = start_date,
-                         stop_date = stop_date)
-
-
-actives$plot_qtr <- with(actives, paste(yr_id, " Q", qtr_id, sep = ""))
-
-actives$plot_group <- NA
-actives$plot_group[actives$report_county %in% "Denver"] <- "Denver"
-actives$plot_group[actives$metro_case %in% "True" & 
-                 !actives$report_county %in% "Denver"] <- "Other Metro Counties"
-
-ggplot(subset(actives, !is.na(plot_group)),
-       aes(x = plot_qtr, fill = plot_group)) +
-    geom_bar(color = "black") +
-    stat_bin(geom="text", aes(label=..count.., vjust = 1.25)) +
-    scale_fill_manual("Patient's Residence", values = c("#ADDD8E", "#31A354")) +
-    labs(x = "Quarter Identified (earliest of date treatment started or date case reported)", 
-         y = "Number of cases",
-         title = "Metro TB Cases by Residence") +
-    theme_bw()
 ```
 
 
 
 
 
-## Active TB Treatment Initiation - Reported Cases vs. Suspects
+## Treatment Initiation and Completion
+-------------------------------------------
+
+### Active TB Treatment Initiation - Reported Cases vs. Suspects
 
 
 
 
-## Treatment Initiation - Active and Latent
+### Treatment Initiation - Active and Latent
 
 
 
 
-## Active Treatment Completion (Overall)
+### Active Treatment Completion (Overall)
 
 
 
 
-## Active Treatment Completion (expected to complete in 12 months)
+### Active Treatment Completion (expected to complete in 12 months)
 
 
 
-## LTBI Treatment Completion (expected to complete in 4 months)
+### LTBI Treatment Completion (expected to complete in 4 months)
 
 
 
 
-## LTBI Treatment Completion (expected to complete in 9 months)
+### LTBI Treatment Completion (expected to complete in 9 months)
 
 
 

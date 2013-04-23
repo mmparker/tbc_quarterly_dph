@@ -8,12 +8,6 @@
 
 
 
-
-# Strings ain't factors
-options(stringsAsFactors = FALSE)
-
-
-
 query_visits <- function(start_date,
                          stop_date = Sys.Date(),
                          odbc = "tbdbplus64") {
