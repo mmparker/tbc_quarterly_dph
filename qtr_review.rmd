@@ -105,7 +105,7 @@ colorwheel <- c("#31A354", "#ADDD8E", "#F03B20", "#43A2CA")
 
 
 
-start_date <- as.Date("2011-04-01")
+start_date <- as.Date("2011-01-01")
 stop_date <- as.Date("2013-03-31")
 
 
