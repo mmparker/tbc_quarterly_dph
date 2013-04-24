@@ -249,7 +249,7 @@ ggplot(metroactives, aes(x = plot_qtr, fill = plot_group)) +
 
 
 
-```{r actives_table,results='asis'}
+```{r,results='asis'}
 
 
 actives_print <- ddply(metroactives, .var = "plot_qtr", .fun = summarise,
@@ -310,18 +310,15 @@ ggplot(visitagg, aes(x = plot_qtr, y = freq, group = location, color = location)
 ```
 
 
-```{r visit_table, results='asis'}
+```{r, results='asis'}
 
 # Cast visits wide
 visits_wide <- dcast(visitagg, plot_qtr ~ location, value.var = "freq")
 
-# Aggregate by year
-visits_wide$year <- substr(visits_wide$plot_qtr, 1, 4)
-
 # Pretty-print
-names(visits_wide) <- c("Quarter", "Total Visits", "Clinic Visits", "Outreach Visits", "Year")
+names(visits_wide) <- c("Quarter", "Total Visits", "Clinic Visits", "Outreach Visits")
 
-dfprint(visits_wide[ , c("Year", "Total Visits", "Clinic Visits", "Outreach Visits")])
+dfprint(visits_wide)
 
 ```
 
