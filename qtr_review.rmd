@@ -7,16 +7,14 @@
 
 
 
-# Denver Metro TB Control Program
-# Quarterly Strategic Area Review
-### First Quarter, 2013
+
 
 ```{r setup, echo=FALSE,results='hide', message=FALSE}
 options(stringsAsFactors = FALSE)
 
 # For the report
 library(knitr)
-library(xtable)
+library(mpmisc)
 
 # For graphics
 library(ggplot2)
@@ -46,12 +44,14 @@ colorwheel <- c("#31A354", "#ADDD8E", "#F03B20", "#43A2CA")
 
 
 
+# Identify the most recently completed quarter
+
+
+
 start_date <- as.Date("2009-01-01")
 stop_date <- as.Date("2013-03-31")
 
 
-# Source the data.frame pretty-printer
-source("..//..//fun//dfprint.r")
 
 
 # Set up a theme for all the plots
@@ -60,6 +60,10 @@ theme_tb <- theme_bw() +
 
 ```
 
+
+# Denver Metro TB Control Program
+# Quarterly Strategic Area Review
+### First Quarter, 2013
 
 
 ## TB Cases in the Denver Metropolitan Area
@@ -199,7 +203,7 @@ actives_print <- merge(x = actives_print,
 names(actives_print) <- c("Quarter", "Total Cases", "Denver", "Other Metro Counties",
                           "Annualized Rate per 100k")
 
-dfprint(xtable(actives_print))
+dfprintif(actives_print)
 
 
 ```
@@ -250,7 +254,7 @@ visits_wide <- dcast(visitagg, plot_qtr ~ location, value.var = "freq")
 # Pretty-print
 names(visits_wide) <- c("Quarter", "Total Visits", "Clinic Visits", "Outreach Visits")
 
-dfprint(visits_wide)
+dfprintif(visits_wide)
 
 ```
 
@@ -295,7 +299,7 @@ tests_wide <- dcast(testagg, plot_qtr ~ test, value.var = "freq")
 # Pretty-print
 names(tests_wide) <- c("Quarter", "CXRs", "QFTs", "TSTs")
 
-dfprint(tests_wide)
+dfprintif(tests_wide)
 
 ```
 
