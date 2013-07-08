@@ -1,68 +1,9 @@
 
-
-<style type="text/css">
-
-body {
-  padding-bottom: 20%;
-}
-
-table {
-  margin-left: auto;
-  margin-right: auto;
-  border: 1px solid #808080;
-  border-collapse: collapse;
-}
-
-th {
-  background-color: #31A354;
-  color: #FFFFFF;
-  border: 1px solid #808080;
-  padding-right: 20px;
-  padding-left: 20px;
-}
-
-td {
-  border: 1px solid #808080;
-  padding-right: 20px;
-  padding-left: 20px;
-}
-
-img {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-p {
-  text-align:center;
-}
+<head>
+<link rel="stylesheet" type="text/css" href="../css/tb_report.css">
+</head>
 
 
-h1 {
-  text-align: center;
-  padding-top: 0px;
-}
-
-h2 {
-  text-align: center;
-  padding-top: 80px;
-}
-
-h3, h4 {
-  text-align: center;
-  padding-top: 30px;
-}
-
-hr {
-  border: 0;
-  height: 1px;
-  background: #333;
-  background-image: -webkit-linear-gradient(left, #ccc, #333, #ccc); 
-  background-image:    -moz-linear-gradient(left, #ccc, #333, #ccc); 
-  background-image:     -ms-linear-gradient(left, #ccc, #333, #ccc); 
-  background-image:      -o-linear-gradient(left, #ccc, #333, #ccc); 
-}
-
-</style>
 
 
 
@@ -109,20 +50,11 @@ start_date <- as.Date("2009-01-01")
 stop_date <- as.Date("2013-03-31")
 
 
-# A function for pretty-printing data.frames
-dfprint <- function(df, printdigits = 2) {
-    print(
-        xtable(format(df, 
-                      na.encode = FALSE, 
-                      digits = printdigits, 
-                      nsmall = printdigits), 
-               align = c("l", "l", rep("c", ncol(df) - 1))
-        ),
-        type = "html",
-        include.rownames = FALSE,
-        NA.string = "-")
-}
+# Source the data.frame pretty-printer
+source("..//..//fun//dfprint.r")
 
+
+# Set up a theme for all the plots
 theme_tb <- theme_bw() +
             theme(legend.key.width = unit(.75, "inches"))
 
