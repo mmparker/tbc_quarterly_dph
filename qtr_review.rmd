@@ -313,8 +313,10 @@ dfprintif(tests_wide)
 source("fun/query_tx_plans.r")
 
 # 
-plans <- query_tx_plans(start_date = first.qtr$start.date,
-                        stop_date = last.qtr$end.date,
+plans <- query_tx_plans(start_date = get_quarter(Date = Sys.Date(),
+                                                 offset = -12)$start.date,
+                        stop_date = get_quarter(Date = Sys.Date(),
+                                                offset = -4)$end.date,
                         odbc = plus)
 
 
