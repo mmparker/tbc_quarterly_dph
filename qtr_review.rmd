@@ -130,10 +130,12 @@ pop <- read.csv("data/metro_pop_estimates.csv")
 metro_pop <- ddply(pop, .var = "year", .fun = summarise, metro_pop = sum(population))
 
 
-# Merge and calculate the case rates
+# Merge and calculate the annual case rates
 actives_count$year <- substr(actives_count$plot_qtr, 1, 4)
 
-actives_rate <- merge(x = actives_count,
+annual_count <- ddply(actives_count, .var = "year", .fun = summarise, freq = sum(freq))
+
+actives_rate <- merge(x = annual_count,
                       y = metro_pop,
                       by = "year",
                       all.x = TRUE)
@@ -181,14 +183,15 @@ ggplot(metroactives, aes(x = plot_qtr, fill = plot_group)) +
 ```{r,results='asis'}
 
 
-actives_print <- ddply(metroactives, .var = "plot_qtr", .fun = summarise,
+actives_print <- ddply(metroactives, .var = "yr_id", .fun = summarise,
                        total = length(report_county),
                        denver = sum(report_county %in% 'Denver'),
                        metro = total - denver)
 
 actives_print <- merge(x = actives_print,
-                       y = actives_rate[ , c("plot_qtr", "rate_pht_annualized")],
-                       by = "plot_qtr",
+                       y = actives_rate[ , c("year", "rate_pht_annualized")],
+                       by.x = "yr_id",
+                       by.y = "year",
                        all.x = TRUE)
                        
 
