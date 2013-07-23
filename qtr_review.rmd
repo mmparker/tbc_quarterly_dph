@@ -45,12 +45,7 @@ colorwheel <- c("#31A354", "#ADDD8E", "#F03B20", "#43A2CA")
 
 
 # Identify the most recently completed quarter
-
-
-
-start_date <- as.Date("2009-01-01")
-stop_date <- as.Date("2013-03-31")
-
+last.qtr <- get_quarter(Date = Sys.Date(), offset = -1)
 
 
 
@@ -63,7 +58,7 @@ theme_tb <- theme_bw() +
 
 # Denver Metro TB Control Program
 # Quarterly Strategic Area Review
-### First Quarter, 2013
+### `r last.qtr$qtr`
 
 
 ## TB Cases in the Denver Metropolitan Area
@@ -73,8 +68,8 @@ theme_tb <- theme_bw() +
 source("fun/query_actives.r")
 
 
-actives <- query_actives(start_date = start_date,
-                         stop_date = stop_date)
+actives <- query_actives(start_date = last.qtr$start.date,
+                         stop_date = last.qtr$end.date)
 
 metroactives <- subset(actives, metro_case %in% 'True')
 
@@ -218,8 +213,8 @@ dfprintif(actives_print)
 
 source("fun/query_visits.r")
 
-visits <- query_visits(start_date = start_date,
-                       stop_date = stop_date)
+visits <- query_visits(start_date = last.qtr$start.date,
+                       stop_date = last.qtr$end.date)
 
 visits$plot_qtr <- with(visits, paste(visit_yr, " Q", visit_qtr, sep = ""))
 
@@ -267,8 +262,8 @@ dfprintif(visits_wide)
 source("fun/query_tests.r")
 
 # Query test results for the period
-tests <- query_tests(start_date = start_date,
-                     stop_date = stop_date)
+tests <- query_tests(start_date = last.qtr$start.date,
+                     stop_date = last.qtr$end.date)
 
 # Convert date to quarter
 tests$plot_qtr <- with(tests, paste(test_yr, " Q", test_qtr, sep = ""))
@@ -315,8 +310,8 @@ dfprintif(tests_wide)
 source("fun/query_tx_plans.r")
 
 # 
-plans <- query_tx_plans(start_date = start_date,
-                        stop_date = stop_date)
+plans <- query_tx_plans(start_date = last.qtr$start.date,
+                        stop_date = last.qtr$end.date)
 
 
 # Create a quarter label
