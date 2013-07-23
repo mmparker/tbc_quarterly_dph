@@ -76,32 +76,15 @@ plus <- connect_to_tbdbplus()
 source("fun/query_actives.r")
 
 
-actives <- query_actives(start_date = first.qtr$start.date,
+# Get active cases over the last ten years
+actives <- query_actives(start_date = get_quarter(Date = Sys.Date(), 
+                                                offset = (4 * -10)
+                                      )$start.date,
                          stop_date = last.qtr$end.date,
                          odbc = plus)
 
 metroactives <- subset(actives, metro_case %in% 'True')
 
-
-# Temporary adjustment
-blank <- rep(NA, 6)
-actives_adj <- data.frame(mrn = blank,
-                          person_id = blank,
-                          last_name = c("IBOBO", "THEN", "KINGMAN", "HASSAN", "KAME", "ZENG"),
-                          first_name = blank,
-                          date_of_birth = blank,
-                          date_counted = blank,
-                          tx_start_date = blank,
-                          report_county = c("Arapahoe", "Denver", "Denver", "Arapahoe", "Adams",
-                                            "Boulder"),
-                          metro_case = "True",
-                          date_id = blank,
-                          mon_id = blank,
-                          yr_id = 2013,
-                          qtr_id = 1
-)
-
-metroactives <- rbind(metroactives, actives_adj)
 
 # Create a quarter label
 metroactives$plot_qtr <- with(metroactives, paste(yr_id, " Q", qtr_id, sep = ""))
@@ -129,7 +112,9 @@ ggplot(actives_count, aes(x = plot_qtr, y = freq, group = 1)) +
     labs(x = "Quarter identified (earliest of date treatment started or date case reported)", 
          y = "Number of cases",
          title = "Active TB in Metropolitan Denver") +
-    theme_tb
+    theme_tb + theme(axis.text.x = element_text(angle = 70, 
+                                                hjust = 1.30, 
+                                                vjust = 1.3))
 
 
 ```
