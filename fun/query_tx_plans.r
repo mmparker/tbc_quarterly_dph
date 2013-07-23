@@ -9,15 +9,14 @@
 
 query_tx_plans <- function(start_date,
                            stop_date = Sys.Date(),
-                           odbc = "tbdbplus64") {
+                           odbc) {
 
     # TODO: argument validation
 
     require(RODBC)
 
-    dbconnect <- odbcConnect(odbc)
 
-    plans <- sqlQuery(dbconnect, paste(
+    plans <- sqlQuery(odbc, paste(
         "SELECT person_id,
                 treat_plan,
                 treat_plan_type,
@@ -42,7 +41,6 @@ query_tx_plans <- function(start_date,
         sep = "")
     )
 
-    odbcClose(dbconnect)
 
     
     # Select the most recent plan for each person

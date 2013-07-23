@@ -8,15 +8,14 @@
 
 query_actives <- function(start_date, 
                           stop_date = Sys.Date(),
-                          odbc = "tbdbplus64") {
+                          odbc) {
 
     # TODO: argument validation
 
     require(RODBC)
 
-    dbconnect <- odbcConnect(odbc)
 
-    actives <- sqlQuery(dbconnect, "
+    actives <- sqlQuery(odbc, "
 
         SELECT mrn,
                person_id, 
@@ -31,7 +30,6 @@ query_actives <- function(start_date,
 
     ")
 
-    odbcClose(dbconnect)
 
 
     # Convert the dates to Dates - POSIXct is overly complicated here
