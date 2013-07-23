@@ -163,9 +163,9 @@ actives_rate$rate_pht_annualized <- with(actives_rate, freq / metro_pop * 4e5)
 
 
 
-```{r cases_by_county, fig.width=20}
+```{r cases_by_county}
 
-ggplot(metroactives, aes(x = plot_qtr, fill = plot_group)) +
+ggplot(metroactives, aes(x = yr_id, fill = plot_group)) +
     geom_bar(color = "black") +
     stat_bin(geom="text", aes(label=..count.., vjust = 1.25)) +
     scale_fill_manual("Patient's Residence", values = c("#ADDD8E", "#31A354")) +
@@ -189,7 +189,7 @@ actives_print <- ddply(metroactives, .var = "yr_id", .fun = summarise,
                        metro = total - denver)
 
 actives_print <- merge(x = actives_print,
-                       y = actives_rate[ , c("year", "rate_pht_annualized")],
+                       y = actives_rate[ , c("year", "rate_pht")],
                        by.x = "yr_id",
                        by.y = "year",
                        all.x = TRUE)
@@ -197,7 +197,7 @@ actives_print <- merge(x = actives_print,
 
 # Print it with nice names
 names(actives_print) <- c("Quarter", "Total Cases", "Denver", "Other Metro Counties",
-                          "Annualized Rate per 100k")
+                          "Rate per 100k")
 
 dfprintif(actives_print)
 
@@ -312,18 +312,18 @@ dfprintif(tests_wide)
 
 source("fun/query_tx_plans.r")
 
-# 
-plans <- query_tx_plans(start_date = get_quarter(Date = Sys.Date(),
-                                                 offset = -12)$start.date,
-                        stop_date = get_quarter(Date = Sys.Date(),
-                                                offset = -4)$end.date,
-                        odbc = plus)
+# Get the plan starts from the last 9 quarters
+plan_starts <- query_tx_plans(start_date = get_quarter(Date = Sys.Date(),
+                                                       offset = -9)$start.date,
+                              stop_date = get_quarter(Date = Sys.Date(),
+                                                      offset = -1)$end.date,
+                              odbc = plus)
 
 
 # Create a quarter label
-plans$plot_qtr <- with(plans, paste(plan_yr, " Q", plan_qtr, sep = ""))
+plan_starts$plot_qtr <- with(plan_starts, paste(plan_yr, " Q", plan_qtr, sep = ""))
 
-plan_summary <- ddply(plans, .var = "plot_qtr", .fun = summarise,
+plan_summary <- ddply(plan_starts, .var = "plot_qtr", .fun = summarise,
                       Active = sum(treat_plan_type %in% "Active"),
                       LTBI = sum(treat_plan_type %in% "LTBI"),
                       RIF = sum(ltbi_drug %in% "RIF"),
@@ -361,6 +361,19 @@ ggplot(act_ltbi_init, aes(x = plot_qtr, y = value, group = variable, color = var
 ### Active Treatment Completion
 
 ```{r}
+
+
+# Query plans again for completion rates, shifting the window back three quarters;
+# those nine months allow for active and INH completion.
+plans <- query_tx_plans(start_date = get_quarter(Date = Sys.Date(),
+                                                 offset = -12)$start.date,
+                        stop_date = get_quarter(Date = Sys.Date(),
+                                                offset = -4)$end.date,
+                        odbc = plus)
+
+
+# Create a quarter label
+plans$plot_qtr <- with(plans, paste(plan_yr, " Q", plan_qtr, sep = ""))
 
 
 # Calculate completion rates for active tx
