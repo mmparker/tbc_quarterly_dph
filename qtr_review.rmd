@@ -161,7 +161,8 @@ actives_rate$rate_pht_annualized <- with(actives_rate, freq / metro_pop * 4e5)
 
 
 
-```{r cases_by_county}
+```{r cases_by_county, fig.width=20}
+
 ggplot(metroactives, aes(x = plot_qtr, fill = plot_group)) +
     geom_bar(color = "black") +
     stat_bin(geom="text", aes(label=..count.., vjust = 1.25)) +
@@ -169,7 +170,10 @@ ggplot(metroactives, aes(x = plot_qtr, fill = plot_group)) +
     labs(x = "Quarter Identified (earliest of date treatment started or date case reported)", 
          y = "Number of cases",
          title = "Reported TB Cases by County of Residence") +
-    theme_tb
+    theme_tb + theme(axis.text.x = element_text(angle = 70, 
+                                                hjust = 1.30, 
+                                                vjust = 1.3))
+
 ```
 
 
