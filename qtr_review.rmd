@@ -44,7 +44,9 @@ colorwheel <- c("#31A354", "#ADDD8E", "#F03B20", "#43A2CA")
 
 
 
-# Identify the most recently completed quarter
+# Get dates for the latest quarter, and for its corresponding quarter two
+# years back
+first.qtr <- get_quarter(Date = Sys.Date(), offset = -9)
 last.qtr <- get_quarter(Date = Sys.Date(), offset = -1)
 
 
@@ -68,7 +70,7 @@ theme_tb <- theme_bw() +
 source("fun/query_actives.r")
 
 
-actives <- query_actives(start_date = last.qtr$start.date,
+actives <- query_actives(start_date = first.qtr$start.date,
                          stop_date = last.qtr$end.date)
 
 metroactives <- subset(actives, metro_case %in% 'True')
@@ -213,7 +215,7 @@ dfprintif(actives_print)
 
 source("fun/query_visits.r")
 
-visits <- query_visits(start_date = last.qtr$start.date,
+visits <- query_visits(start_date = first.qtr$start.date,
                        stop_date = last.qtr$end.date)
 
 visits$plot_qtr <- with(visits, paste(visit_yr, " Q", visit_qtr, sep = ""))
@@ -262,7 +264,7 @@ dfprintif(visits_wide)
 source("fun/query_tests.r")
 
 # Query test results for the period
-tests <- query_tests(start_date = last.qtr$start.date,
+tests <- query_tests(start_date = first.qtr$start.date,
                      stop_date = last.qtr$end.date)
 
 # Convert date to quarter
@@ -310,7 +312,7 @@ dfprintif(tests_wide)
 source("fun/query_tx_plans.r")
 
 # 
-plans <- query_tx_plans(start_date = last.qtr$start.date,
+plans <- query_tx_plans(start_date = first.qtr$start.date,
                         stop_date = last.qtr$end.date)
 
 
