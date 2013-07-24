@@ -61,7 +61,7 @@ plus <- connect_to_tbdbplus()
 
 # Denver Metro TB Control Program
 # Quarterly Strategic Area Review
-## `r last.qtr$qtr`
+# `r last.qtr$qtr`
 
 
 ## TB Cases in the Denver Metropolitan Area
