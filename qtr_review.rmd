@@ -28,7 +28,7 @@ opts_chunk$set(echo = FALSE,
                dpi=300,
                out.width="700px",
                dev="png",
-               cache = TRUE)
+               cache = FALSE)
 
 
 
@@ -175,7 +175,7 @@ ggplot(metroactives, aes(x = yr_id, fill = plot_group)) +
 
 
 
-```{r,results='asis'}
+```{r cases_table,results='asis'}
 
 
 actives_print <- ddply(metroactives, .var = "yr_id", .fun = summarise,
@@ -241,7 +241,7 @@ ggplot(visitagg, aes(x = plot_qtr, y = freq, group = location, color = location)
 ```
 
 
-```{r, results='asis'}
+```{r visits_table, results='asis'}
 
 # Cast visits wide
 visits_wide <- dcast(visitagg, plot_qtr ~ location, value.var = "freq")
@@ -288,7 +288,7 @@ ggplot(testagg, aes(x = plot_qtr, y = freq, group = test, color = test)) +
 ```
 
 
-```{r, results='asis'}
+```{r screens_table, results='asis'}
 
 # Cast tests wide
 tests_wide <- dcast(testagg, plot_qtr ~ test, value.var = "freq")
@@ -336,7 +336,7 @@ plan_summary <- ddply(plan_starts, .var = "plot_qtr", .fun = summarise,
 
 ### Treatment Plans Initiated by Type
 
-```{r}
+```{r tx_init}
 
 plan_melt <- melt(plan_summary, id.var = "plot_qtr")
 
@@ -361,7 +361,7 @@ ggplot(act_ltbi_init, aes(x = plot_qtr, y = value, group = variable, color = var
 
 ### Completion of Active Therapy
 
-```{r}
+```{r active_comp}
 
 
 # Query plans again for completion rates, shifting the window back three quarters;
@@ -439,7 +439,7 @@ ggplot(act_plot, aes(x = plot_qtr, y = per_complete, color = variable, group = v
 # Completion of LTBI Therapy
 
 
-```{r}
+```{r ltbi_comp}
 
 
 # Calculate completion rates for latent tx
