@@ -386,11 +386,44 @@ act_comp <- ddply(subset(plans, treat_plan_type %in% "Active"),
                  per_complete = n_complete / n * 100)
 
 
+# Pull in the national averages and national targets
+nat_avg <- read.csv(file.path("data", "ntip_stats.csv"))
+
+# Add the quarter label
+nat_avg$plot_qtr <- with(nat_avg, paste(year, " Q", qtr, sep = ""))
+
+# Subset to only the quarters in the Denver data
+nat_avg_sub <- subset(nat_avg, plot_qtr %in% act_comp$plot_qtr)
+
+# Melt it so that average and target are separate records
+nat_melt <- melt(nat_avg_sub, 
+                 id.var = "plot_qtr", 
+                 measure.var = c("national_average", "target_2015"))
+
+
+# Tidy up the variable labels and column names for stacking
+nat_melt$variable <- as.character(nat_melt$variable)
+nat_melt$variable[nat_melt$variable %in% "national_average"] <- "National Average"
+nat_melt$variable[nat_melt$variable %in% "target_2015"] <- "National 2015 Target"
+
+act_comp$variable <- "Denver Metro"
+
+names(nat_melt)[names(nat_melt) %in% "value"] <- "per_complete"
+
+
+# Combine our data, the national average, and the national targets
+act_plot <- rbind(act_comp[ , c("plot_qtr", "per_complete", "variable")],
+                  nat_melt)
+
+
+
 # Plot it
-ggplot(act_comp, aes(x = plot_qtr, y = per_complete, group = 1)) +
- geom_point(size = point_size, color = colorwheel[1]) +
- geom_line(size = line_size, color = colorwheel[1]) +
+ggplot(act_plot, aes(x = plot_qtr, y = per_complete, color = variable, group = variable)) +
+ geom_point(size = point_size) +
+ geom_line(aes(linetype = variable), size = line_size) +
  expand_limits(y = c(0, 100)) +
+ scale_color_manual("Statistic", values = colorwheel[1:3]) +
+ scale_linetype_discrete("Statistic") +
  labs(x = "Quarter",
       y = "Percent Completed",
       title = "Completion of Active Therapy") +
@@ -419,17 +452,33 @@ ltbi_comp <- ddply(subset(plans, ltbi_drug %in% c("RIF", "INH", "INH/Rifapentine
 )
 
 
+# Add the national target
+ltbi_plot <- rbind(ltbi_comp[ , c("plot_qtr", "ltbi_drug", "per_complete")],
+                   data.frame(plot_qtr = sort(unique(ltbi_comp[ , "plot_qtr"])),
+                              ltbi_drug = "National 2015 Target for Contacts",
+                              per_complete = 79)
+)
+
+
 # Plot it
-ggplot(ltbi_comp, aes(x = plot_qtr, y = per_complete, group = ltbi_drug, color = ltbi_drug)) +
+ggplot(ltbi_plot, aes(x = plot_qtr, y = per_complete, group = ltbi_drug, color = ltbi_drug)) +
     geom_point(size = point_size) +
     geom_line(aes(linetype = ltbi_drug), size = line_size) +
     expand_limits(y = c(0, 100)) +
-    scale_color_manual("Regimen", values = colorwheel[1:3]) +
+    scale_color_manual("Regimen", values = colorwheel[1:4]) +
     scale_linetype_discrete("Regimen") +
     labs(x = "Quarter",
          y = "Percent Completed",
          title = "Completion of LTBI Therapy") +
     theme_tb
+
+
+```
+
+
+```{r cleanup}
+
+odbcClose(plus)
 
 
 ```
