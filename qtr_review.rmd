@@ -1,7 +1,7 @@
 
 
 
-```{r setup, echo=FALSE,results='hide', message=FALSE}
+```{r setup, echo=FALSE,results='hide', message=FALSE, warning=FALSE}
 options(stringsAsFactors = FALSE)
 
 # For the report
@@ -58,7 +58,7 @@ plus <- connect_to_tbdbplus()
 
 # Denver Metro TB Control Program
 # Quarterly Strategic Area Review
-### `r last.qtr$qtr`
+## `r last.qtr$qtr`
 
 
 ## TB Cases in the Denver Metropolitan Area
@@ -103,7 +103,7 @@ ggplot(actives_count, aes(x = plot_qtr, y = freq, group = 1)) +
     expand_limits(y = 0) +
     labs(x = "Quarter identified (earliest of date treatment started or date case reported)", 
          y = "Number of cases",
-         title = "Active TB in Metropolitan Denver") +
+         title = "TB Cases in Metropolitan Denver, by Quarter") +
     theme_tb + theme(axis.text.x = element_text(angle = 70, 
                                                 hjust = 1.30, 
                                                 vjust = 1.3))
@@ -163,7 +163,7 @@ ggplot(metroactives, aes(x = yr_id, fill = plot_group)) +
     scale_fill_manual("Patient's Residence", values = c("#ADDD8E", "#31A354")) +
     labs(x = "Quarter Identified (earliest of date treatment started or date case reported)", 
          y = "Number of cases",
-         title = "Reported TB Cases by County of Residence") +
+         title = "TB Cases by County of Residence") +
     theme_tb + theme(axis.text.x = element_text(angle = 70, 
                                                 hjust = 1.30, 
                                                 vjust = 1.3))
@@ -198,7 +198,7 @@ dfprintif(actives_print)
 
 
 
-## Visits - Clinic vs. Outreach
+## Clinic and Outreach Visits
 -------------------------------------------
 
 ```{r visits_inout}
@@ -275,8 +275,7 @@ ggplot(testagg, aes(x = plot_qtr, y = freq, group = test, color = test)) +
     scale_color_manual("Diagnostic", values = colorwheel[1:3]) +
     scale_linetype_discrete("Diagnostic") +
     labs(x = "Diagnostic date", 
-         y = "Number of diagnostics",
-         title = "Screenings for Active and Latent Tuberculosis") +
+         y = "Number of diagnostics") +
     theme_tb
 ```
 
@@ -326,7 +325,6 @@ plan_summary <- ddply(plan_starts, .var = "plot_qtr", .fun = summarise,
 
 ```
 
-### Treatment Initiation - Active and Latent
 
 ```{r}
 
@@ -350,7 +348,6 @@ ggplot(act_ltbi_init, aes(x = plot_qtr, y = value, group = variable, color = var
 
 
 
-### Active Treatment Completion
 
 ```{r}
 
@@ -395,10 +392,10 @@ nat_melt <- melt(nat_avg_sub,
 
 # Tidy up the variable labels and column names for stacking
 nat_melt$variable <- as.character(nat_melt$variable)
-nat_melt$variable[nat_melt$variable %in% "national_average"] <- "National Average"
-nat_melt$variable[nat_melt$variable %in% "target_2015"] <- "National 2015 Target"
+nat_melt$variable[nat_melt$variable %in% "national_average"] <- "National Average (Standard Cases)"
+nat_melt$variable[nat_melt$variable %in% "target_2015"] <- "National 2015 Target (Standard Cases)"
 
-act_comp$variable <- "Denver Metro"
+act_comp$variable <- "Denver Metro (All Cases)"
 
 names(nat_melt)[names(nat_melt) %in% "value"] <- "per_complete"
 
@@ -426,7 +423,6 @@ ggplot(act_plot, aes(x = plot_qtr, y = per_complete, color = variable, group = v
 
 
 
-### LTBI Treatment Completion
 
 ```{r}
 
