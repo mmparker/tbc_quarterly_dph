@@ -191,7 +191,7 @@ actives_print <- merge(x = actives_print,
                        
 
 # Print it with nice names
-names(actives_print) <- c("Quarter", "Total Cases", "Denver", "Other Metro Counties",
+names(actives_print) <- c("Year", "Total Cases", "Denver", "Other Metro Counties",
                           "Rate per 100k")
 
 dfprintif(actives_print)
