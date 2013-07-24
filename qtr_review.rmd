@@ -1,12 +1,4 @@
 
-<head>
-<link rel="stylesheet" type="text/css" href="../css/tb_report.css">
-</head>
-
-
-
-
-
 
 
 ```{r setup, echo=FALSE,results='hide', message=FALSE}
