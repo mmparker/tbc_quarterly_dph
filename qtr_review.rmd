@@ -23,9 +23,12 @@ opts_chunk$set(echo = FALSE,
                message = FALSE,
                warning = TRUE,
                error = TRUE,
-               fig.width = 10,
-               dev="svg",
-               cache = FALSE)
+               fig.width=8,
+               fig.height=5.6,
+               dpi=300,
+               out.width="700px",
+               dev="png",
+               cache = TRUE)
 
 
 
@@ -232,7 +235,9 @@ ggplot(visitagg, aes(x = plot_qtr, y = freq, group = location, color = location)
     scale_linetype_discrete("Visit Location") +
     labs(x = "Visit date", 
          y = "Number of visits") +
-    theme_tb
+    theme_tb + theme(axis.text.x = element_text(angle = 70, 
+                                                hjust = 1.30, 
+                                                vjust = 1.3))
 ```
 
 
@@ -277,7 +282,9 @@ ggplot(testagg, aes(x = plot_qtr, y = freq, group = test, color = test)) +
     scale_linetype_discrete("Diagnostic") +
     labs(x = "Diagnostic date", 
          y = "Number of diagnostics") +
-    theme_tb
+    theme_tb + theme(axis.text.x = element_text(angle = 70, 
+                                                hjust = 1.30, 
+                                                vjust = 1.3))
 ```
 
 
@@ -344,7 +351,9 @@ ggplot(act_ltbi_init, aes(x = plot_qtr, y = value, group = variable, color = var
     scale_linetype_manual("Plan Type", values = c(1, 2)) +
     labs(x = "Quarter initiated", 
          y = "Number of patients") +
-    theme_tb
+    theme_tb + theme(axis.text.x = element_text(angle = 70, 
+                                                hjust = 1.30, 
+                                                vjust = 1.3))
 
 ```
 
@@ -395,10 +404,10 @@ nat_melt <- melt(nat_avg_sub,
 
 # Tidy up the variable labels and column names for stacking
 nat_melt$variable <- as.character(nat_melt$variable)
-nat_melt$variable[nat_melt$variable %in% "national_average"] <- "National Average (Standard Cases)"
-nat_melt$variable[nat_melt$variable %in% "target_2015"] <- "National 2015 Target (Standard Cases)"
+nat_melt$variable[nat_melt$variable %in% "national_average"] <- "National Average*"
+nat_melt$variable[nat_melt$variable %in% "target_2015"] <- "National 2015 Target*"
 
-act_comp$variable <- "Denver Metro (All Cases)"
+act_comp$variable <- "All Denver Metro Cases"
 
 names(nat_melt)[names(nat_melt) %in% "value"] <- "per_complete"
 
@@ -418,7 +427,9 @@ ggplot(act_plot, aes(x = plot_qtr, y = per_complete, color = variable, group = v
  scale_linetype_discrete("Statistic") +
  labs(x = "Quarter",
       y = "Percent Completed") +
- theme_tb
+    theme_tb + theme(axis.text.x = element_text(angle = 70, 
+                                                hjust = 1.30, 
+                                                vjust = 1.3))
 
 
 ```
@@ -447,7 +458,7 @@ ltbi_comp <- ddply(subset(plans, ltbi_drug %in% c("RIF", "INH", "INH/Rifapentine
 # Add the national target
 ltbi_plot <- rbind(ltbi_comp[ , c("plot_qtr", "ltbi_drug", "per_complete")],
                    data.frame(plot_qtr = sort(unique(ltbi_comp[ , "plot_qtr"])),
-                              ltbi_drug = "National 2015 Target for Contacts",
+                              ltbi_drug = "National 2015 Target*",
                               per_complete = 79)
 )
 
@@ -461,7 +472,9 @@ ggplot(ltbi_plot, aes(x = plot_qtr, y = per_complete, group = ltbi_drug, color =
     scale_linetype_discrete("Regimen") +
     labs(x = "Quarter",
          y = "Percent Completed") +
-    theme_tb
+    theme_tb + theme(axis.text.x = element_text(angle = 70, 
+                                                hjust = 1.30, 
+                                                vjust = 1.3))
 
 
 ```
