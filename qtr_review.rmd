@@ -94,6 +94,7 @@ actives_count <- count(metroactives, "plot_qtr")
 
 ```
 
+### TB Cases in Metropolitan Denver, by Quarter
 
 ```{r total_cases}
 
@@ -102,8 +103,7 @@ ggplot(actives_count, aes(x = plot_qtr, y = freq, group = 1)) +
     geom_line(size = line_size, color = "#31A354") +
     expand_limits(y = 0) +
     labs(x = "Quarter identified (earliest of date treatment started or date case reported)", 
-         y = "Number of cases",
-         title = "TB Cases in Metropolitan Denver, by Quarter") +
+         y = "Number of cases") +
     theme_tb + theme(axis.text.x = element_text(angle = 70, 
                                                 hjust = 1.30, 
                                                 vjust = 1.3))
@@ -148,11 +148,12 @@ actives_rate$rate_pht_annualized <- with(actives_rate, freq / metro_pop * 4e5)
 #   geom_line(size = line_size, color = "#31A354") +
 #   expand_limits(y = 0) +
 #   labs(x = "Quarter identified (earliest of date treatment started or date case reported)", 
-#        y = "Annualized rate per 100,000 residents",
-#        title = "Rates of Active TB in Metropolitan Denver") +
+#        y = "Annualized rate per 100,000 residents") +
 #   theme_tb
 ```
 
+
+### TB Cases by County of Residence
 
 
 ```{r cases_by_county}
@@ -162,8 +163,7 @@ ggplot(metroactives, aes(x = yr_id, fill = plot_group)) +
     stat_bin(geom="text", aes(label=..count.., vjust = 1.25)) +
     scale_fill_manual("Patient's Residence", values = c("#ADDD8E", "#31A354")) +
     labs(x = "Quarter Identified (earliest of date treatment started or date case reported)", 
-         y = "Number of cases",
-         title = "TB Cases by County of Residence") +
+         y = "Number of cases") +
     theme_tb + theme(axis.text.x = element_text(angle = 70, 
                                                 hjust = 1.30, 
                                                 vjust = 1.3))
@@ -198,8 +198,10 @@ dfprintif(actives_print)
 
 
 
-## Clinic and Outreach Visits
+## Patient Visits by Location
 -------------------------------------------
+
+
 
 ```{r visits_inout}
 
@@ -229,8 +231,7 @@ ggplot(visitagg, aes(x = plot_qtr, y = freq, group = location, color = location)
     scale_color_manual("Visit Location", values = colorwheel[1:3]) +
     scale_linetype_discrete("Visit Location") +
     labs(x = "Visit date", 
-         y = "Number of visits",
-         title = "Patient Visits by Location") +
+         y = "Number of visits") +
     theme_tb
 ```
 
@@ -326,6 +327,8 @@ plan_summary <- ddply(plan_starts, .var = "plot_qtr", .fun = summarise,
 ```
 
 
+### Treatment Plans Initiated by Type
+
 ```{r}
 
 plan_melt <- melt(plan_summary, id.var = "plot_qtr")
@@ -340,14 +343,14 @@ ggplot(act_ltbi_init, aes(x = plot_qtr, y = value, group = variable, color = var
     scale_color_manual("Plan Type", values = colorwheel[1:2]) +
     scale_linetype_manual("Plan Type", values = c(1, 2)) +
     labs(x = "Quarter initiated", 
-         y = "Number of patients",
-         title = "Treatment Plans Initiated by Type") +
+         y = "Number of patients") +
     theme_tb
 
 ```
 
 
 
+### Completion of Active Therapy
 
 ```{r}
 
@@ -414,8 +417,7 @@ ggplot(act_plot, aes(x = plot_qtr, y = per_complete, color = variable, group = v
  scale_color_manual("Statistic", values = colorwheel[1:3]) +
  scale_linetype_discrete("Statistic") +
  labs(x = "Quarter",
-      y = "Percent Completed",
-      title = "Completion of Active Therapy") +
+      y = "Percent Completed") +
  theme_tb
 
 
@@ -423,11 +425,13 @@ ggplot(act_plot, aes(x = plot_qtr, y = per_complete, color = variable, group = v
 
 
 
+# Completion of LTBI Therapy
+
 
 ```{r}
 
 
-# Calculate completion rates for active tx
+# Calculate completion rates for latent tx
 ltbi_comp <- ddply(subset(plans, ltbi_drug %in% c("RIF", "INH", "INH/Rifapentine")),
                    .var = c("ltbi_drug", "plot_qtr"),
                    .fun = summarise,
@@ -456,8 +460,7 @@ ggplot(ltbi_plot, aes(x = plot_qtr, y = per_complete, group = ltbi_drug, color =
     scale_color_manual("Regimen", values = colorwheel[1:4]) +
     scale_linetype_discrete("Regimen") +
     labs(x = "Quarter",
-         y = "Percent Completed",
-         title = "Completion of LTBI Therapy") +
+         y = "Percent Completed") +
     theme_tb
 
 
