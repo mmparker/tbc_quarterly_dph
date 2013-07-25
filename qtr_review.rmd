@@ -181,7 +181,9 @@ ggplot(metroactives, aes(x = yr_id, fill = plot_group)) +
 actives_print <- ddply(metroactives, .var = "yr_id", .fun = summarise,
                        total = length(report_county),
                        denver = sum(report_county %in% 'Denver'),
-                       metro = total - denver)
+                       metro = total - denver,
+                       denverprop = as.integer(denver / total * 100)
+)
 
 actives_print <- merge(x = actives_print,
                        y = actives_rate[ , c("year", "rate_pht")],
@@ -192,7 +194,7 @@ actives_print <- merge(x = actives_print,
 
 # Print it with nice names
 names(actives_print) <- c("Year", "Total Cases", "Denver", "Other Metro Counties",
-                          "Rate per 100k")
+                          "% Denver", "Rate per 100k")
 
 dfprintif(actives_print)
 
@@ -307,7 +309,7 @@ dfprintif(tests_wide)
 ## Treatment Initiation and Completion
 -------------------------------------------
 
-```{r}
+```{r plan_start}
 
 source("fun/query_tx_plans.r")
 
@@ -334,6 +336,9 @@ plan_summary <- ddply(plan_starts, .var = "plot_qtr", .fun = summarise,
 ```
 
 
+
+
+
 ### Treatment Plans Initiated by Type
 
 ```{r tx_init}
@@ -357,6 +362,18 @@ ggplot(act_ltbi_init, aes(x = plot_qtr, y = value, group = variable, color = var
 
 ```
 
+
+
+```{r tx_init_table, results='asis'}
+
+# Pretty names
+names(plan_summary) <- c("Quarter", "Active", "LTBI", "Rifampin", "INH", "INH/Rifapentine")
+
+dfprintif(plan_summary)
+
+
+
+```
 
 
 ### Completion of Active Therapy
@@ -435,6 +452,42 @@ ggplot(act_plot, aes(x = plot_qtr, y = per_complete, color = variable, group = v
 ```
 
 
+```{r active_comp_table, results='asis'}
+
+# Set up a version to print
+act_print <- act_comp[ , c("plot_qtr", "n", 
+                           "n_complete", "n_incomplete", 
+                           "n_ongoing", "per_complete")]
+
+
+# Pretty names
+names(act_print) <- c("Quarter", "N Started", 
+                      "N Completed", "N Not Completed", 
+                      "N Ongoing", "% Complete")
+
+
+dfprint(act_print)
+
+
+
+```
+
+
+
+### Patients on Active Therapy Marked as Incomplete or Ongoing
+```{r act_inc,results='asis'}
+
+act_inc <- subset(plans,
+                  subset = treat_plan_type %in% "Active" &
+                           completion_status %in% c("Ongoing", "Not Completed"),
+                  select = c("person_id", "plot_qtr", "treat_plan", 
+                             "completion_status", "reason_stopped", "plan_author")
+)
+
+dfprint(act_inc)
+
+```
+
 
 # Completion of LTBI Therapy
 
@@ -451,7 +504,9 @@ ltbi_comp <- ddply(subset(plans, ltbi_drug %in% c("RIF", "INH", "INH/Rifapentine
            n_complete = sum(completion_status %in% "Completed"),
            n_incomplete = sum(completion_status %in% "Not Completed"),
            n_ongoing = sum(completion_status %in% "Ongoing"),
-           per_complete = n_complete / n * 100
+           per_complete = n_complete / n * 100,
+           per_incomplete = n_incomplete / n * 100,
+           per_ongoing = n_ongoing / n * 100
 )
 
 
@@ -476,6 +531,44 @@ ggplot(ltbi_plot, aes(x = plot_qtr, y = per_complete, group = ltbi_drug, color =
                                                 hjust = 1.30, 
                                                 vjust = 1.3))
 
+
+```
+
+```{r ltbi_comp_table, results='asis'}
+
+# Set up a version to print
+ltbi_print <- ltbi_comp[ , c("ltbi_drug", "plot_qtr", "n", 
+                             "n_complete", "per_complete", 
+                             "n_incomplete", "per_incomplete",
+                             "n_ongoing", "per_ongoing")]
+
+
+# Pretty names
+names(ltbi_print) <- c("LTBI Regimen", "Quarter", "N Started", 
+                       "N Completed", "% Complete",
+                       "N Not Completed", "% Not Completed",
+                       "N Ongoing", "% Ongoing")
+
+
+dfprint(ltbi_print)
+
+
+
+```
+
+
+
+### Patients on LTBI Therapy Marked as Ongoing
+```{r ltbi_inc,results='asis'}
+
+ltbi_inc <- subset(plans,
+                  subset = treat_plan_type %in% "LTBI" &
+                           completion_status %in% "Ongoing",
+                  select = c("person_id", "plot_qtr", "treat_plan", 
+                             "completion_status", "reason_stopped", "plan_author")
+)
+
+dfprint(ltbi_inc)
 
 ```
 
