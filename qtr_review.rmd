@@ -484,7 +484,7 @@ act_inc <- subset(plans,
                              "completion_status", "reason_stopped", "plan_author")
 )
 
-dfprint(act_inc)
+dfprint(arrange(act_inc, plot_qtr, person_id))
 
 ```
 
@@ -568,7 +568,7 @@ ltbi_inc <- subset(plans,
                              "completion_status", "reason_stopped", "plan_author")
 )
 
-dfprint(ltbi_inc)
+dfprint(arrange(ltbi_inc, plot_qtr, person_id))
 
 ```
 
