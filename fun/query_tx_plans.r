@@ -32,10 +32,8 @@ query_tx_plans <- function(start_date,
                 days_to_end
          FROM Tx_Plan_View
          WHERE author_affiliation = 'Denver Metro TB Clinic'
-            AND treat_plan_date BETWEEN #", 
+            AND treat_plan_date  >= #",
             start_date, 
-            "# AND #", 
-            stop_date, 
             "#",
             "ORDER BY person_id, treat_plan_date DESC",
         sep = "")
@@ -60,6 +58,8 @@ query_tx_plans <- function(start_date,
     latest_plan$plan_qtr <- (as.numeric(latest_plan$plan_mon) + 2) %/% 3
 
 
-    latest_plan
+    # Return each individual's latest plan, if it started on or before
+    # the stop date
+    latest_plan[as.Date(latest_plan$treat_plan_date) <= stop_date, ]
 
 }
