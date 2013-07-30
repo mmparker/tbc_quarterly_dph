@@ -422,7 +422,7 @@ nat_melt <- melt(nat_avg_sub,
 # Tidy up the variable labels and column names for stacking
 nat_melt$variable <- as.character(nat_melt$variable)
 nat_melt$variable[nat_melt$variable %in% "national_average"] <- "National Average*"
-nat_melt$variable[nat_melt$variable %in% "target_2015"] <- "National 2015 Target*"
+nat_melt$variable[nat_melt$variable %in% "target_2015"] <- "National 2015 Target* (93%)"
 
 act_comp$variable <- "All Denver Metro Cases"
 
@@ -513,7 +513,7 @@ ltbi_comp <- ddply(subset(plans, ltbi_drug %in% c("RIF", "INH", "INH/Rifapentine
 # Add the national target
 ltbi_plot <- rbind(ltbi_comp[ , c("plot_qtr", "ltbi_drug", "per_complete")],
                    data.frame(plot_qtr = sort(unique(ltbi_comp[ , "plot_qtr"])),
-                              ltbi_drug = "National 2015 Target*",
+                              ltbi_drug = "National 2015 Target* (79%)",
                               per_complete = 79)
 )
 
