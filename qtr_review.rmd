@@ -142,7 +142,12 @@ actives_rate$metro_pop[is.na(actives_rate$metro_pop)] <-
 
 # Calculate rates
 actives_rate$rate_pht <- with(actives_rate, freq / metro_pop * 1e5)
-actives_rate$rate_pht_annualized <- with(actives_rate, freq / metro_pop * 4e5)
+
+# For the most recent year, annualize the rate
+actives_rate$rate_pht[actives_rate$year %in% substr(last.qtr$qtr, 1, 4)] <- 
+    with(actives_rate[actives_rate$year %in% substr(last.qtr$qtr, 1, 4), ],
+         freq / metro_pop * (4 / last.qtr$qtr.num * 1e5)
+)
 
 
 # Plot it
