@@ -494,9 +494,12 @@ dfprint(arrange(act_inc, plot_qtr, person_id))
 
 ```{r ltbi_comp}
 
+# Exclude any INH/Rifpentine plans before 2012
+plans_trim <- plans[!(plans$ltbi_drug %in% "INH/Rifapentine" & plans$plan_yr < 2012), ]
+
 
 # Calculate completion rates for latent tx
-ltbi_comp <- ddply(subset(plans, ltbi_drug %in% c("RIF", "INH", "INH/Rifapentine")),
+ltbi_comp <- ddply(subset(plans_trim, ltbi_drug %in% c("RIF", "INH", "INH/Rifapentine")),
                    .var = c("ltbi_drug", "plot_qtr"),
                    .fun = summarise,
                    
