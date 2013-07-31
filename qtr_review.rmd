@@ -63,6 +63,7 @@ plus <- connect_to_tbdbplus()
 # Quarterly Strategic Area Review
 # `r last.qtr$qtr`
 
+Updated at `r paste(Sys.time())`
 
 ## TB Cases in the Denver Metropolitan Area
 -------------------------------------------
