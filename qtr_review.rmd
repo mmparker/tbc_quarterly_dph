@@ -71,10 +71,11 @@ plus <- connect_to_tbdbplus()
 source("fun/query_actives.r")
 
 
-# Get active cases over the last ten years
-actives <- query_actives(start_date = get_quarter(Date = Sys.Date(), 
-                                                offset = (4 * -10)
-                                      )$start.date,
+# Get active cases over the last ten years.
+# Ensure that the oldest year is a full year
+actives <- query_actives(start_date = as.Date(paste(as.numeric(format(Sys.Date(), "%Y")) - 10,
+                                                    "-01-01", 
+                                                    sep = "")),
                          stop_date = last.qtr$end.date,
                          odbc = plus)
 
