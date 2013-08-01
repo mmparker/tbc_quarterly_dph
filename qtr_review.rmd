@@ -92,30 +92,15 @@ metroactives$plot_group[metroactives$report_county %in% "Denver"] <- "Denver"
 metroactives$plot_group[!metroactives$report_county %in% "Denver"] <- "Other Metro Counties"
 
 
-# Aggregate
-actives_count <- count(metroactives, "plot_qtr")
+# Aggregate into two years of quarterly counts and ten years of annual counts
+actives_qtr <- count(metroactives[metroactives$date_id > first.qtr$start.date, ], "plot_qtr")
+
+actives_annual <- count(metroactives, "yr_id")
 
 
-
-```
-
-### TB Cases in Metropolitan Denver, by Quarter
-
-```{r total_cases}
-
-ggplot(actives_count, aes(x = plot_qtr, y = freq, group = 1)) +
-    geom_point(size = point_size, color = "#31A354") +
-    geom_line(size = line_size, color = "#31A354") +
-    expand_limits(y = 0) +
-    labs(x = "Quarter identified (earliest of date treatment started or date case reported)", 
-         y = "Number of cases") +
-    theme_tb + theme(axis.text.x = element_text(angle = 70, 
-                                                hjust = 1.30, 
-                                                vjust = 1.3))
 
 
 ```
-
 
 
 ```{r case_rates}
@@ -127,14 +112,10 @@ pop <- read.csv("data/metro_pop_estimates.csv")
 metro_pop <- ddply(pop, .var = "year", .fun = summarise, metro_pop = sum(population))
 
 
-# Merge and calculate the annual case rates
-actives_count$year <- substr(actives_count$plot_qtr, 1, 4)
-
-annual_count <- ddply(actives_count, .var = "year", .fun = summarise, freq = sum(freq))
-
-actives_rate <- merge(x = annual_count,
+actives_rate <- merge(x = actives_annual,
                       y = metro_pop,
-                      by = "year",
+                      by.x = "yr_id",
+                      by.y = "year",
                       all.x = TRUE)
 
 # Fill in any years with missing population estimates using the previous years
@@ -146,8 +127,8 @@ actives_rate$metro_pop[is.na(actives_rate$metro_pop)] <-
 actives_rate$rate_pht <- with(actives_rate, freq / metro_pop * 1e5)
 
 # For the most recent year, annualize the rate
-actives_rate$rate_pht[actives_rate$year %in% substr(last.qtr$qtr, 1, 4)] <- 
-    with(actives_rate[actives_rate$year %in% substr(last.qtr$qtr, 1, 4), ],
+actives_rate$rate_pht[actives_rate$yr_id %in% substr(last.qtr$qtr, 1, 4)] <- 
+    with(actives_rate[actives_rate$yr_id %in% substr(last.qtr$qtr, 1, 4), ],
          freq / metro_pop * (4 / last.qtr$qtr.num * 1e5)
 )
 
@@ -193,9 +174,8 @@ actives_print <- ddply(metroactives, .var = "yr_id", .fun = summarise,
 )
 
 actives_print <- merge(x = actives_print,
-                       y = actives_rate[ , c("year", "rate_pht")],
-                       by.x = "yr_id",
-                       by.y = "year",
+                       y = actives_rate[ , c("yr_id", "rate_pht")],
+                       by = "yr_id",
                        all.x = TRUE)
                        
 
@@ -208,6 +188,24 @@ dfprintif(actives_print)
 
 ```
 
+
+### TB Cases in Metropolitan Denver, by Quarter
+
+```{r total_cases}
+
+
+ggplot(actives_qtr, aes(x = plot_qtr, y = freq, group = 1)) +
+    geom_point(size = point_size, color = "#31A354") +
+    geom_line(size = line_size, color = "#31A354") +
+    expand_limits(y = 0) +
+    labs(x = "Quarter identified (earliest of date treatment started or date case reported)", 
+         y = "Number of cases") +
+    theme_tb + theme(axis.text.x = element_text(angle = 70, 
+                                                hjust = 1.30, 
+                                                vjust = 1.3))
+
+
+```
 
 
 ## Patient Visits by Location
