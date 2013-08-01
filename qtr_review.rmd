@@ -471,7 +471,7 @@ names(act_print) <- c("Quarter", "N Started",
                       "N Ongoing", "% Complete")
 
 
-dfprint(act_print)
+dfprintif(act_print)
 
 
 
@@ -489,7 +489,8 @@ act_inc <- subset(plans,
                              "completion_status", "reason_stopped", "plan_author")
 )
 
-dfprint(arrange(act_inc, plot_qtr, person_id))
+dfprintif(arrange(act_inc, plot_qtr, person_id),
+          norowmsg = "All active therapy during this period appears to be completed.")
 
 ```
 
@@ -558,7 +559,7 @@ names(ltbi_print) <- c("LTBI Regimen", "Quarter", "N Started",
                        "N Ongoing", "% Ongoing")
 
 
-dfprint(ltbi_print)
+dfprintif(ltbi_print)
 
 
 
@@ -576,7 +577,8 @@ ltbi_inc <- subset(plans,
                              "completion_status", "reason_stopped", "plan_author")
 )
 
-dfprint(arrange(ltbi_inc, plot_qtr, person_id))
+dfprintif(arrange(ltbi_inc, plot_qtr, person_id),
+          norowmsg = "All LTBI therapy during this period appears to be completed or abandoned.")
 
 ```
 
