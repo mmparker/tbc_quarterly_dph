@@ -7,6 +7,7 @@ options(stringsAsFactors = FALSE)
 # For the report
 library(knitr)
 library(mpmisc)
+library(tbdbaid)
 
 # For graphics
 library(ggplot2)
