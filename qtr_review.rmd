@@ -54,9 +54,6 @@ theme_tb <- theme_bw() +
 
 
 
-# Connect to TBdbPlus
-plus <- connect_to_tbdbplus()
-
 
 ```
 
@@ -71,16 +68,13 @@ Updated at `r paste(Sys.time())`
 -------------------------------------------
 
 ```{r cases}
-source("fun/query_actives.r")
-
 
 # Get active cases over the last ten years.
 # Ensure that the oldest year is a full year
 actives <- query_actives(start_date = as.Date(paste(as.numeric(format(Sys.Date(), "%Y")) - 10,
                                                     "-01-01", 
                                                     sep = "")),
-                         stop_date = last.qtr$end.date,
-                         odbc = plus)
+                         stop_date = last.qtr$end.date)
 
 metroactives <- subset(actives, metro_case %in% 'True')
 
@@ -218,11 +212,8 @@ ggplot(actives_qtr, aes(x = plot_qtr, y = freq, group = 1)) +
 ```{r visits_inout}
 
 
-source("fun/query_visits.r")
-
 visits <- query_visits(start_date = first.qtr$start.date,
-                       stop_date = last.qtr$end.date,
-                       odbc = plus)
+                       stop_date = last.qtr$end.date)
 
 visits$plot_qtr <- with(visits, paste(visit_yr, " Q", visit_qtr, sep = ""))
 
@@ -267,13 +258,9 @@ dfprintif(visits_wide)
 -------------------------------------------
 ```{r screens}
 
-# Load the function
-source("fun/query_tests.r")
-
 # Query test results for the period
 tests <- query_tests(start_date = first.qtr$start.date,
-                     stop_date = last.qtr$end.date,
-                     odbc = plus)
+                     stop_date = last.qtr$end.date)
 
 # Convert date to quarter
 tests$plot_qtr <- with(tests, paste(test_yr, " Q", test_qtr, sep = ""))
@@ -318,14 +305,11 @@ dfprintif(tests_wide)
 
 ```{r plan_start}
 
-source("fun/query_tx_plans.r")
-
 # Get the plan starts from the last 9 quarters
 plan_starts <- query_tx_plans(start_date = get_quarter(Date = Sys.Date(),
                                                        offset = -9)$start.date,
                               stop_date = get_quarter(Date = Sys.Date(),
-                                                      offset = -1)$end.date,
-                              odbc = plus)
+                                                      offset = -1)$end.date)
 
 
 # Create a quarter label
@@ -393,8 +377,7 @@ dfprintif(plan_summary)
 plans <- query_tx_plans(start_date = get_quarter(Date = Sys.Date(),
                                                  offset = -12)$start.date,
                         stop_date = get_quarter(Date = Sys.Date(),
-                                                offset = -4)$end.date,
-                        odbc = plus)
+                                                offset = -4)$end.date)
 
 
 # Create a quarter label
@@ -587,7 +570,6 @@ dfprintif(arrange(ltbi_inc, plot_qtr, person_id),
 
 ```{r cleanup}
 
-odbcClose(plus)
 
 
 ```
