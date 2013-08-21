@@ -2,6 +2,7 @@
 
 
 ```{r setup, echo=FALSE,results='hide', message=FALSE, warning=FALSE}
+
 options(stringsAsFactors = FALSE)
 
 # For the report
