@@ -374,18 +374,19 @@ dfprintif(plan_summary)
 
 # Query plans again for completion rates, shifting the window back three quarters;
 # those nine months allow for active and INH completion.
-plans <- query_tx_plans(start_date = get_quarter(Date = Sys.Date(),
-                                                 offset = -12)$start.date,
-                        stop_date = get_quarter(Date = Sys.Date(),
-                                                offset = -4)$end.date)
+latest_plans <- query_latest_plans(start_date = get_quarter(Date = Sys.Date(),
+                                                           offset = -12)$start.date,
+                                   stop_date = get_quarter(Date = Sys.Date(),
+                                                           offset = -4)$end.date)
 
 
 # Create a quarter label
-plans$plot_qtr <- with(plans, paste(plan_yr, " Q", plan_qtr, sep = ""))
+latest_plans$plot_qtr <- with(latest_plans, 
+                              paste(plan_yr, " Q", plan_qtr, sep = ""))
 
 
 # Calculate completion rates for active tx
-act_comp <- ddply(subset(plans, treat_plan_type %in% "Active"),
+act_comp <- ddply(subset(latest_plans, treat_plan_type %in% "Active"),
                  .var = "plot_qtr", .fun = summarise,
                  n = sum(completion_status %in% c("Completed", "Not Completed", "Ongoing")),
                  n_complete = sum(completion_status %in% "Completed"),
@@ -467,7 +468,7 @@ dfprintif(act_print)
 ### Patients on Active Therapy Marked as Incomplete or Ongoing
 ```{r act_inc,results='asis'}
 
-act_inc <- subset(plans,
+act_inc <- subset(latest_plans,
                   subset = treat_plan_type %in% "Active" &
                            completion_status %in% c("Ongoing", "Not Completed"),
                   select = c("person_id", "plot_qtr", "treat_plan", 
@@ -486,7 +487,8 @@ dfprintif(arrange(act_inc, plot_qtr, person_id),
 ```{r ltbi_comp}
 
 # Exclude any INH/Rifpentine plans before 2012
-plans_trim <- plans[!(plans$ltbi_drug %in% "INH/Rifapentine" & plans$plan_yr < 2012), ]
+plans_trim <- latest_plans[!(latest_plans$ltbi_drug %in% "INH/Rifapentine" & 
+                             latest_plans$plan_yr < 2012), ]
 
 
 # Calculate completion rates for latent tx
@@ -555,7 +557,7 @@ dfprintif(ltbi_print)
 ### Patients on LTBI Therapy Marked as Ongoing
 ```{r ltbi_inc,results='asis'}
 
-ltbi_inc <- subset(plans,
+ltbi_inc <- subset(latest_plans,
                   subset = treat_plan_type %in% "LTBI" &
                            completion_status %in% "Ongoing",
                   select = c("person_id", "plot_qtr", "treat_plan", 
