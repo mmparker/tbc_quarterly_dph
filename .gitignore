@@ -3,5 +3,6 @@
 cache/*
 figure/
 functionalize/
+archive/
 *.html
 *.md
