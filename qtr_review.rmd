@@ -149,7 +149,7 @@ ggplot(metroactives, aes(x = yr_id, fill = plot_group)) +
     geom_bar(color = "black") +
     stat_bin(geom="text", aes(label=..count.., vjust = 1.25)) +
     scale_fill_manual("Patient's Residence", values = c("#ADDD8E", "#31A354")) +
-    labs(x = "Quarter Identified (earliest of date treatment started or date case reported)", 
+    labs(x = "Year Identified (earliest of date treatment started or date case reported)", 
          y = "Number of cases") +
     theme_tb + theme(axis.text.x = element_text(angle = 70, 
                                                 hjust = 1.30, 
