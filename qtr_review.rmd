@@ -507,18 +507,20 @@ ltbi_comp <- ddply(subset(plans_trim, ltbi_drug %in% c("RIF", "INH", "INH/Rifape
 
 
 # Add the national target
-ltbi_plot <- rbind(ltbi_comp[ , c("plot_qtr", "ltbi_drug", "per_complete")],
+ltbi_plot <- rbind(ltbi_comp[ , c("plot_qtr", "ltbi_drug", "n", "per_complete")],
                    data.frame(plot_qtr = sort(unique(ltbi_comp[ , "plot_qtr"])),
                               ltbi_drug = "National 2015 Target* (79%)",
+                              n = NA,
                               per_complete = 79)
 )
 
 
 # Plot it
 ggplot(ltbi_plot, aes(x = plot_qtr, y = per_complete, group = ltbi_drug, color = ltbi_drug)) +
-    geom_point(size = point_size) +
+    geom_point(aes(size = n)) +
     geom_line(aes(linetype = ltbi_drug), size = line_size) +
     expand_limits(y = c(0, 100)) +
+    scale_size_continuous("Number of Patients", range = c(5, 10)) +
     scale_color_manual("Regimen", values = colorwheel[1:4]) +
     scale_linetype_discrete("Regimen") +
     labs(x = "Quarter",
