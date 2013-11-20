@@ -424,7 +424,7 @@ names(nat_melt)[names(nat_melt) %in% "value"] <- "per_complete"
 act_plot <- rbind(act_comp[ , c("plot_qtr", "per_complete", "variable")],
                   nat_melt)
 
-act_plot$per_complete[8] <- 100
+
 
 # Plot it
 ggplot(act_plot, aes(x = plot_qtr, y = per_complete, color = variable, group = variable)) +
