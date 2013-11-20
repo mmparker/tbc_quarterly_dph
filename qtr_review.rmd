@@ -520,7 +520,7 @@ ggplot(ltbi_plot, aes(x = plot_qtr, y = per_complete, group = ltbi_drug, color =
     geom_point(aes(size = n)) +
     geom_line(aes(linetype = ltbi_drug), size = line_size) +
     expand_limits(y = c(0, 100)) +
-    scale_size_continuous("Number of Patients", range = c(5, 10)) +
+    scale_size_continuous("Number of Patients", range = c(3, 7)) +
     scale_color_manual("Regimen", values = colorwheel[1:4]) +
     scale_linetype_discrete("Regimen") +
     labs(x = "Quarter",
