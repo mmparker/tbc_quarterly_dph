@@ -496,7 +496,9 @@ ltbi_comp <- ddply(subset(plans_trim, ltbi_drug %in% c("RIF", "INH", "INH/Rifape
                    .var = c("ltbi_drug", "plot_qtr"),
                    .fun = summarise,
                    
-           n = sum(completion_status %in% c("Completed", "Not Completed", "Ongoing")),
+           n = sum(completion_status %in% c("Completed", 
+                                            "Not Completed", 
+                                            "Ongoing")),
            n_complete = sum(completion_status %in% "Completed"),
            n_incomplete = sum(completion_status %in% "Not Completed"),
            n_ongoing = sum(completion_status %in% "Ongoing"),
@@ -504,6 +506,26 @@ ltbi_comp <- ddply(subset(plans_trim, ltbi_drug %in% c("RIF", "INH", "INH/Rifape
            per_incomplete = n_incomplete / n * 100,
            per_ongoing = n_ongoing / n * 100
 )
+
+
+# Calculate overall plan completion
+ltbi_comp_overall <- ddply(subset(plans_trim, ltbi_drug %in% c("RIF", 
+                                                   "INH", 
+                                                   "INH/Rifapentine")),
+                           .var = "plot_qtr",
+                           .fun = summarise,
+                           
+           n = sum(completion_status %in% c("Completed", 
+                                            "Not Completed",
+                                            "Ongoing")),
+           n_complete = sum(completion_status %in% "Completed"),
+           n_incomplete = sum(completion_status %in% "Not Completed"),
+           n_ongoing = sum(completion_status %in% "Ongoing"),
+           per_complete = n_complete / n * 100,
+           per_incomplete = n_incomplete / n * 100,
+           per_ongoing = n_ongoing / n * 100
+)
+
 
 
 # Add the national target
