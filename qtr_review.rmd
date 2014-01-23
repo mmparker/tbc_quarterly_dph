@@ -614,9 +614,9 @@ ggplot(ltbi_inc, aes(x = reason_incomplete)) +
     scale_x_discrete(drop = FALSE) +
     labs(x = "Reason Treatment Not Completed",
          y = "Percent of LTBI Patients") +
-    theme_tb + theme(axis.text.x = element_text(angle = 70, 
-                                                hjust = 1.30, 
-                                                vjust = 1.3))
+    theme_tb + theme(axis.text.x = element_text(angle = 45,
+                                                hjust = 1,
+                                                vjust = 1))
 
 
 ```
