@@ -13,6 +13,7 @@ library(tbdbaid)
 # For graphics
 library(ggplot2)
 library(gridExtra)
+library(scales)
 
 # For aggregation
 library(plyr)
@@ -578,17 +579,60 @@ dfprintif(ltbi_print)
 
 
 
-### Patients on LTBI Therapy Marked as Ongoing
-```{r ltbi_inc,results='asis'}
+### Reasons for Incomplete LTBI Treatment
+
+```{r ltbi_inc}
 
 ltbi_inc <- subset(latest_plans,
+                  subset = treat_plan_type %in% "LTBI" &
+                           completion_status %in% c("Not Completed",
+                                                    "Ongoing",
+                                                    "Other"),
+                  select = c("person_id", "plot_qtr", "treat_plan", 
+                             "completion_status", "reason_stopped", "plan_author")
+)
+
+
+# Set up a reason_incomplete variable - basically "reason_stopped",
+# but "Ongoing" if a person's treatment is still ongoing.
+ltbi_inc$reason_incomplete <- ltbi_inc$reason_stopped
+ltbi_inc$reason_incomplete[ltbi_inc$completion_status %in% "Ongoing"] <- "Ongoing"
+
+# Make it a factor
+ltbi_inc$reason_incomplete <- factor(
+    x = ltbi_inc$reason_incomplete,
+    levels = c("Uncooperative/Refused", "Ongoing", "Moved", "Lost",
+               "Drug Toxicity", "Died", "Not TB", "Other"),
+    ordered = TRUE
+)
+
+
+ggplot(ltbi_inc, aes(x = reason_incomplete)) +
+    geom_bar(aes(y = (..count..) / sum(..count..)),
+             drop = FALSE) +
+    scale_y_continuous(labels = percent) +
+    scale_x_discrete(drop = FALSE) +
+    labs(x = "Reason Treatment Not Completed",
+         y = "Percent of LTBI Patients") +
+    theme_tb + theme(axis.text.x = element_text(angle = 70, 
+                                                hjust = 1.30, 
+                                                vjust = 1.3))
+
+
+```
+
+
+### Patients on LTBI Therapy Marked as Ongoing
+```{r ltbi_ongoing,results='asis'}
+
+ltbi_ongoing <- subset(latest_plans,
                   subset = treat_plan_type %in% "LTBI" &
                            completion_status %in% "Ongoing",
                   select = c("person_id", "plot_qtr", "treat_plan", 
                              "completion_status", "reason_stopped", "plan_author")
 )
 
-dfprintif(arrange(ltbi_inc, plot_qtr, person_id),
+dfprintif(arrange(ltbi_ongoing, plot_qtr, person_id),
           norowmsg = "All LTBI therapy during this period appears to be completed or abandoned.")
 
 ```
