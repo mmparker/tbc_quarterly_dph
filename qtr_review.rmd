@@ -532,7 +532,7 @@ ltbi_comp_overall <- ddply(subset(plans_trim, ltbi_drug %in% c("RIF",
 ltbi_plot <- rbind(ltbi_comp[ , c("plot_qtr", "ltbi_drug", "n", "per_complete")],
                    data.frame(plot_qtr = sort(unique(ltbi_comp[ , "plot_qtr"])),
                               ltbi_drug = "National 2015 Target* (79%)",
-                              n = NA,
+                              n = 1,
                               per_complete = 79)
 )
 
