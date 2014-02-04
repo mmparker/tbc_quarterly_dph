@@ -172,18 +172,20 @@ metroactives$plot_county[metroactives$plot_county %in%
 # Merge on all years 
 county_actives <- merge(
     x = expand.grid(yr_id = unique(metroactives$yr_id),
-                            plot_county = unique(metroactives$plot_county)),
+                    plot_county = unique(metroactives$plot_county),
+                    stringsAsFactors = FALSE),
     y = count(metroactives, c("yr_id", "plot_county")),
     all.x = TRUE,
     by = c("yr_id", "plot_county")
 )
+
 
 # Replace NAs with zeroes
 county_actives$freq[is.na(county_actives$freq)] <- 0
 
 
 ggplot(county_actives, aes(x = yr_id, y = freq, color = plot_county)) +
-    geom_point(aes(shape = plot_county), size = 8) +
+    geom_point(aes(shape = plot_county), size = 5) +
     geom_line(aes(linetype = plot_county, group = plot_county), size = 1.1) +
     labs(x = "Year Identified (earliest of date treatment started or date case reported)", 
          y = "Number of cases",
