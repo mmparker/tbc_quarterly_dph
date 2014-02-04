@@ -171,8 +171,8 @@ metroactives$plot_county[metroactives$plot_county %in%
 
 # Merge on all years 
 county_actives <- merge(
-    x = expand.grid(yr_id = unique(county_actives$yr_id),
-                            plot_county = unique(county_actives$plot_county)),
+    x = expand.grid(yr_id = unique(metroactives$yr_id),
+                            plot_county = unique(metroactives$plot_county)),
     y = count(metroactives, c("yr_id", "plot_county")),
     all.x = TRUE,
     by = c("yr_id", "plot_county")
