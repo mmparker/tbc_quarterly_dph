@@ -441,6 +441,34 @@ plan_summary <- ddply(plan_starts, .var = "plot_qtr", .fun = summarise,
 
 
 
+### Active Treatment Starts by Regimen
+
+```{r active_regimens, results = 'asis'}
+
+active_regimens <- subset(plan_starts, treat_plan_type %in% "Active")
+
+active_regimens_count <- ddply(active_regimens, 
+                               .var = "treat_plan",
+                               .fun = summarise,
+                               n = length(treat_plan),
+                               per = calc_percent(n, nrow(active_regimens), 1)
+)
+
+# Strip out "Active TB - ", etc - that's obvious from context
+active_regimens_count$treat_plan <- sub(x = active_regimens_count$treat_plan,
+                                        pattern = "Active TB - | - Active",
+                                        replace = "")
+
+
+# Rename and print
+names(active_regimens_count) <- c("Regimen", "Freq", "Percent")
+
+dfprintif(arrange(active_regimens_count, desc(Freq)))
+
+
+
+```
+
 
 
 ### Treatment Plans Initiated by Type
