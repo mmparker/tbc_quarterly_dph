@@ -245,6 +245,59 @@ dfprintif(actives_print)
 ```
 
 
+```{r case_rate_plot}
+
+
+# Pop in the national case rate
+national_rate <- data.frame(Year = 2004:2012,
+                                 rate = c(4.9, 4.8, 4.6, 4.4, 4.2,
+                                          3.8, 3.6, 3.4, 3.2),
+                                 stat = "National Rate"
+)
+
+
+
+# Combine them
+metro_rate <- actives_print[c("Year", "Rate per 100k")]
+metro_rate$stat <- "Metro Rate"
+names(metro_rate) <- c("Year", "rate", "stat")
+
+plot_rates <- rbind(
+    subset(metro_rate, 
+           subset = Year < as.numeric(format(Sys.Date(), "%Y"))),
+    national_rate
+)
+
+
+
+ggplot(plot_rates, aes(x = as.numeric(Year), y = rate, color = stat)) +
+    geom_point(aes(shape = stat), size = 6) +
+    geom_line(aes(group = stat, linetype = stat), size = 1.5) +
+    geom_hline(yintercept = 0.1, color = "red") +
+    annotate("text", 
+             x = mean(as.numeric(plot_rates$Year), na.rm = TRUE),
+             y = 0.25,
+             label = "TB Elimination Goal: 1 per million per year",
+             color = "red") +
+    scale_color_manual(values = c("#31A354", "#ADDD8E")) +
+    expand_limits(y = 0) +
+    labs(x = "Year",
+         y = "Rate per 100,000 Residents",
+         color = "Metric",
+         shape = "Metric",
+         linetype = "Metric",
+         title = "TB Case Rate for Metro Denver") +
+    theme_tb
+
+
+
+
+
+```
+
+
+
+
 ### TB Cases in Metropolitan Denver, by Quarter
 
 ```{r total_cases}
